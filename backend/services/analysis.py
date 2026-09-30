@@ -1,3 +1,6 @@
+import re
+import unicodedata
+
 import pandas as pd
 
 
@@ -50,6 +53,25 @@ BUSINESS_COLUMN_ALIASES = {
         "units",
     },
 }
+
+def normalize_column_name(column_name: str) -> str:
+    """
+    Padroniza nomes de colunas para facilitar a identificação automática.
+    """
+
+    name = str(column_name).strip().lower()
+
+    name = unicodedata.normalize("NFKD", name)
+    name = "".join(
+        character
+        for character in name
+        if not unicodedata.combining(character)
+    )
+
+    name = re.sub(r"[^a-z0-9]+", "_", name)
+    name = name.strip("_")
+
+    return name
 
 
 def analyze_dataframe(df: pd.DataFrame) -> dict:
@@ -148,7 +170,7 @@ def analyze_dataframe(df: pd.DataFrame) -> dict:
 
     # Insights de negócio
     normalized_columns = {
-        str(column).strip().lower(): column
+        normalize_column_name(column): column
         for column in df.columns
     }
 

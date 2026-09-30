@@ -183,3 +183,40 @@ def test_percentage_metric_does_not_have_sum():
 
     assert result["numeric_statistics"]["receita"]["sum"] == 600.0
     assert result["numeric_statistics"]["margem_percentual"]["mean"] == 65.0
+
+
+def test_normalizes_business_column_names():
+    df = pd.DataFrame(
+        {
+            "Total Vendas": [1000.0, 2000.0, 3000.0],
+            "CUSTO TOTAL": [400.0, 800.0, 1200.0],
+            "Profit": [600.0, 1200.0, 1800.0],
+            "Margem de Lucro": [60.0, 60.0, 60.0],
+        }
+    )
+
+    result = analyze_dataframe(df)
+
+    assert any(
+        "Receita total identificada: R$ 6,000.00."
+        in insight
+        for insight in result["insights"]
+    )
+
+    assert any(
+        "Custo total identificado: R$ 2,400.00."
+        in insight
+        for insight in result["insights"]
+    )
+
+    assert any(
+        "Lucro total identificado: R$ 3,600.00."
+        in insight
+        for insight in result["insights"]
+    )
+
+    assert any(
+        "Margem percentual média: 60.00%."
+        in insight
+        for insight in result["insights"]
+    )
