@@ -119,13 +119,13 @@ def analyze_dataframe(df: pd.DataFrame) -> dict:
     metric_columns = [
         column
         for column in numeric_columns
-        if column.lower() not in CALENDAR_COLUMNS
+        if normalize_column_name(column) not in CALENDAR_COLUMNS
     ]
 
     calendar_columns = [
         column
         for column in numeric_columns
-        if column.lower() in CALENDAR_COLUMNS
+        if normalize_column_name(column) in CALENDAR_COLUMNS
     ]
 
     # Estatísticas somente para métricas úteis

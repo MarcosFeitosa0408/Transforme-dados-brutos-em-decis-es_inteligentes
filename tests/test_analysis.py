@@ -220,3 +220,25 @@ def test_normalizes_business_column_names():
         in insight
         for insight in result["insights"]
     )
+
+def test_normalizes_calendar_column_names():
+    df = pd.DataFrame(
+        {
+            "ANO": [2025, 2025, 2025],
+            "Mês": [1, 2, 3],
+            "Dia": [10, 15, 20],
+            "Receita": [100.0, 200.0, 300.0],
+        }
+    )
+
+    result = analyze_dataframe(df)
+
+    assert "ANO" in result["calendar_columns"]
+    assert "Mês" in result["calendar_columns"]
+    assert "Dia" in result["calendar_columns"]
+
+    assert "ANO" not in result["metric_columns"]
+    assert "Mês" not in result["metric_columns"]
+    assert "Dia" not in result["metric_columns"]
+
+    assert "Receita" in result["metric_columns"]
