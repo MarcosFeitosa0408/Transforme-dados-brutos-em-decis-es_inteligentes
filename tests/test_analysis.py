@@ -166,3 +166,20 @@ def test_business_column_aliases():
         in insight
         for insight in result["insights"]
     )
+
+
+def test_percentage_metric_does_not_have_sum():
+    df = pd.DataFrame(
+        {
+            "receita": [100.0, 200.0, 300.0],
+            "margem_percentual": [60.0, 65.0, 70.0],
+        }
+    )
+
+    result = analyze_dataframe(df)
+
+    assert "sum" in result["numeric_statistics"]["receita"]
+    assert "sum" not in result["numeric_statistics"]["margem_percentual"]
+
+    assert result["numeric_statistics"]["receita"]["sum"] == 600.0
+    assert result["numeric_statistics"]["margem_percentual"]["mean"] == 65.0

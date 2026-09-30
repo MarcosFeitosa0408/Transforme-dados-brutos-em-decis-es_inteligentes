@@ -118,8 +118,12 @@ def analyze_dataframe(df: pd.DataFrame) -> dict:
                 "maximum": float(series.max()),
                 "mean": round(float(series.mean()), 2),
                 "median": round(float(series.median()), 2),
-                "sum": round(float(series.sum()), 2),
             }
+
+        if column.lower() != "margem_percentual":
+            numeric_statistics[column]["sum"] = round(
+                    float(series.sum()), 2
+         )  
 
     insights = []
 
@@ -155,7 +159,7 @@ def analyze_dataframe(df: pd.DataFrame) -> dict:
             if alias in normalized_columns:
                 detected_business_columns[business_name] = (
                     normalized_columns[alias]
-                )
+            )
                 break
 
     if "receita" in detected_business_columns:
