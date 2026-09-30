@@ -132,3 +132,37 @@ def test_calendar_columns_are_not_metrics():
 
     assert "receita" in result["numeric_statistics"]
     assert "lucro" in result["numeric_statistics"]
+
+
+def test_business_column_aliases():
+    df = pd.DataFrame(
+        {
+            "produto": ["A", "B", "C"],
+            "faturamento": [1000.0, 2000.0, 3000.0],
+            "cost": [400.0, 800.0, 1200.0],
+            "profit": [600.0, 1200.0, 1800.0],
+            "qtd": [10, 20, 30],
+        }
+    )
+
+    result = analyze_dataframe(df)
+
+    assert result["rows"] == 3
+
+    assert any(
+        "Receita total identificada: R$ 6,000.00."
+        in insight
+        for insight in result["insights"]
+    )
+
+    assert any(
+        "Custo total identificado: R$ 2,400.00."
+        in insight
+        for insight in result["insights"]
+    )
+
+    assert any(
+        "Lucro total identificado: R$ 3,600.00."
+        in insight
+        for insight in result["insights"]
+    )
