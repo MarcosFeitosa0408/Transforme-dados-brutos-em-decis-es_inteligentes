@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="description"
+        content="DataPilot - Transforme dados brutos em decisões inteligentes."
+    >
+
+    <title>DataPilot | Análise Inteligente de Dados</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="container header-content">
+            <div class="brand">
+                <span class="brand-icon">DP</span>
+
+                <div>
+                    <h1>DataPilot</h1>
+                    <p>Transforme dados brutos em decisões inteligentes.</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <section class="hero">
+            <span class="badge">DATA ANALYTICS</span>
+
+            <h2>Analise seus dados em poucos segundos</h2>
+
+            <p>
+                Envie um arquivo CSV ou Excel e receba automaticamente
+                indicadores de qualidade, estatísticas e insights sobre
+                seus dados.
+            </p>
+        </section>
+
+        <section class="upload-card">
+
+            <div class="upload-area" id="uploadArea">
+
+                <div class="upload-icon">↑</div>
+
+                <h3>Envie seu arquivo</h3>
+
+                <p>
+                    Selecione um arquivo CSV ou Excel (.xlsx)
+                </p>
+
+                <input
+                    type="file"
+                    id="fileInput"
+                    accept=".csv,.xlsx"
+                    hidden
+                >
+
+                <button
+                    type="button"
+                    id="selectFileButton"
+                    class="primary-button"
+                >
+                    Selecionar arquivo
+                </button>
+
+                <p id="selectedFile" class="selected-file">
+                    Nenhum arquivo selecionado
+                </p>
+
+            </div>
+
+            <button
+                type="button"
+                id="analyzeButton"
+                class="analyze-button"
+                disabled
+            >
+                Analisar dados
+            </button>
+
+            <div
+                id="loading"
+                class="loading hidden"
+                aria-live="polite"
+            >
+                Analisando seus dados...
+            </div>
+
+            <div
+                id="errorMessage"
+                class="error-message hidden"
+                role="alert"
+            ></div>
+
+        </section>
+
+        <section id="results" class="results hidden">
+
+            <div class="section-heading">
+                <div>
+                    <span class="badge">RESULTADOS</span>
+                    <h2>Visão geral dos dados</h2>
+                </div>
+
+                <p id="resultFilename"></p>
+            </div>
+
+            <div class="kpi-grid">
+
+                <article class="kpi-card">
+                    <span>Linhas</span>
+                    <strong id="rowsValue">0</strong>
+                </article>
+
+                <article class="kpi-card">
+                    <span>Colunas</span>
+                    <strong id="columnsValue">0</strong>
+                </article>
+
+                <article class="kpi-card">
+                    <span>Valores ausentes</span>
+                    <strong id="missingValue">0</strong>
+                </article>
+
+                <article class="kpi-card">
+                    <span>Duplicados</span>
+                    <strong id="duplicatesValue">0</strong>
+                </article>
+
+                <article class="kpi-card quality-card">
+                    <span>Qualidade dos dados</span>
+                    <strong id="qualityValue">0%</strong>
+                </article>
+
+            </div>
+
+            <div class="content-grid">
+
+                <article class="panel">
+                    <h3>Insights automáticos</h3>
+
+                    <ul id="insightsList" class="insights-list"></ul>
+                </article>
+
+                <article class="panel">
+                    <h3>Métricas identificadas</h3>
+
+                    <div
+                        id="metricsList"
+                        class="metrics-list"
+                    ></div>
+                </article>
+
+            </div>
+
+            <article class="panel statistics-panel">
+
+                <h3>Estatísticas numéricas</h3>
+
+                <div class="table-wrapper">
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Métrica</th>
+                                <th>Mínimo</th>
+                                <th>Máximo</th>
+                                <th>Média</th>
+                                <th>Mediana</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="statisticsTable"></tbody>
+                    </table>
+
+                </div>
+
+            </article>
+
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>
+                DataPilot — Análise inteligente de dados
+            </p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
