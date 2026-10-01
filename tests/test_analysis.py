@@ -242,3 +242,22 @@ def test_normalizes_calendar_column_names():
     assert "Dia" not in result["metric_columns"]
 
     assert "Receita" in result["metric_columns"]
+
+def test_profit_margin_alias_does_not_have_sum():
+    df = pd.DataFrame(
+        {
+            "Receita": [100.0, 200.0, 300.0],
+            "Margem de Lucro": [60.0, 65.0, 70.0],
+        }
+    )
+
+    result = analyze_dataframe(df)
+
+    assert "sum" in result["numeric_statistics"]["Receita"]
+    assert "sum" not in result["numeric_statistics"]["Margem de Lucro"]
+
+    assert result["numeric_statistics"]["Receita"]["sum"] == 600.0
+    assert (
+        result["numeric_statistics"]["Margem de Lucro"]["mean"]
+        == 65.0
+    )

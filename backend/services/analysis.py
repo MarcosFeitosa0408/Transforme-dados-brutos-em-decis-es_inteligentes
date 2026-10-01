@@ -142,7 +142,10 @@ def analyze_dataframe(df: pd.DataFrame) -> dict:
                 "median": round(float(series.median()), 2),
             }
 
-        if column.lower() != "margem_percentual":
+        if (
+            normalize_column_name(column)
+            not in BUSINESS_COLUMN_ALIASES["margem_percentual"]
+        ):
             numeric_statistics[column]["sum"] = round(
                     float(series.sum()), 2
          )  
