@@ -161,6 +161,9 @@ function renderResults(data) {
 
     renderInsights(analysis.insights);
     renderMetrics(analysis.metric_columns);
+    renderCalendarColumns(
+    analysis.calendar_columns,
+    analysis.calendar_summary);
     renderStatistics(analysis.numeric_statistics);
 
     results.classList.remove("hidden");
@@ -202,6 +205,62 @@ function renderMetrics(metrics) {
         tag.textContent = metric;
 
         metricsList.appendChild(tag);
+    });
+}
+
+
+function renderCalendarColumns(columns, summary) {
+    const calendarList = document.getElementById("calendarList");
+
+    calendarList.innerHTML = "";
+
+    if (!columns || columns.length === 0) {
+        calendarList.textContent =
+            "Nenhuma coluna de calendário identificada.";
+
+        return;
+    }
+
+    const labels = {
+        ano: ["Ano", "Anos"],
+        mes: ["Mês", "Meses"],
+        dia: ["Dia", "Dias"],
+    };
+
+    columns.forEach((column) => {
+        const data = summary?.[column];
+        const tag = document.createElement("span");
+
+        tag.className = "metric-tag";
+
+        if (data) {
+            const normalizedColumn = column
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "");
+
+            const labelOptions = labels[normalizedColumn];
+
+            if (labelOptions) {
+                const isSingleValue =
+                    data.minimum === data.maximum;
+
+                const label = isSingleValue
+                    ? labelOptions[0]
+                    : labelOptions[1];
+
+                tag.textContent = isSingleValue
+                    ? `${label}: ${data.minimum}`
+                    : `${label}: ${data.minimum} a ${data.maximum}`;
+            } else {
+                tag.textContent =
+                    `${column}: ${data.minimum} a ${data.maximum}`;
+            }
+        } else {
+            tag.textContent = column;
+        }
+
+        calendarList.appendChild(tag);
     });
 }
 

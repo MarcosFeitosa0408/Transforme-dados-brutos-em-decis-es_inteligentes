@@ -229,6 +229,18 @@ def analyze_dataframe(df: pd.DataFrame) -> dict:
             "O conjunto apresenta problemas relevantes de qualidade."
         )
 
+    calendar_summary = {}
+
+    for column in calendar_columns:
+        series = df[column].dropna()
+
+        if not series.empty:
+            calendar_summary[column] = {
+                "minimum": int(series.min()),
+                "maximum": int(series.max()),
+                "unique_values": int(series.nunique()),
+            }
+
     return {
         "rows": total_rows,
         "columns": total_columns,
@@ -243,6 +255,7 @@ def analyze_dataframe(df: pd.DataFrame) -> dict:
         "numeric_columns": numeric_columns,
         "metric_columns": metric_columns,
         "calendar_columns": calendar_columns,
+        "calendar_summary": calendar_summary,
         "numeric_statistics": numeric_statistics,
         "insights": insights,
     }
