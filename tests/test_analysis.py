@@ -257,7 +257,26 @@ def test_profit_margin_alias_does_not_have_sum():
     assert "sum" not in result["numeric_statistics"]["Margem de Lucro"]
 
     assert result["numeric_statistics"]["Receita"]["sum"] == 600.0
-    assert (
-        result["numeric_statistics"]["Margem de Lucro"]["mean"]
-        == 65.0
+    assert result["numeric_statistics"]["Margem de Lucro"]["mean"] == 65.0
+
+
+def test_receita_has_priority_over_faturamento():
+    df = pd.DataFrame(
+        {
+            "Produto": ["A", "B"],
+            "Receita": [100.0, 200.0],
+            "Faturamento": [1000.0, 2000.0],
+        }
+    )
+
+    result = analyze_dataframe(df)
+
+    assert any(
+        "Receita total identificada: R$ 300.00." in insight
+        for insight in result["insights"]
+    )
+
+    assert not any(
+        "Receita total identificada: R$ 3,000.00." in insight
+        for insight in result["insights"]
     )

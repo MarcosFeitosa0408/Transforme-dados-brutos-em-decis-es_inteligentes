@@ -12,7 +12,7 @@ CALENDAR_COLUMNS = {
 }
 
 BUSINESS_COLUMN_ALIASES = {
-    "receita": {
+    "receita": (
         "receita",
         "faturamento",
         "valor_venda",
@@ -21,37 +21,37 @@ BUSINESS_COLUMN_ALIASES = {
         "vendas",
         "revenue",
         "sales",
-    },
-    "custo": {
+    ),
+    "custo": (
         "custo",
         "custos",
         "custo_total",
         "valor_custo",
         "cost",
         "costs",
-    },
-    "lucro": {
+    ),
+    "lucro": (
         "lucro",
         "lucro_total",
         "resultado",
         "profit",
-    },
-    "margem_percentual": {
+    ),
+    "margem_percentual": (
         "margem_percentual",
         "margem",
         "margem_lucro",
         "margem_de_lucro",
         "profit_margin",
         "margin",
-    },
-    "quantidade": {
+    ),
+    "quantidade": (
         "quantidade",
         "qtd",
         "qtde",
         "unidades",
         "quantity",
         "units",
-    },
+    ),
 }
 
 def normalize_column_name(column_name: str) -> str:
