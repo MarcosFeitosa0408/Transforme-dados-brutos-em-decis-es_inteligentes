@@ -166,6 +166,7 @@ function renderResults(data) {
     analysis.calendar_summary);
     renderStatistics(analysis.numeric_statistics);
     renderMetricsChart(analysis.numeric_statistics);
+    renderCategoryChart(analysis.revenue_by_category);
 
     results.classList.remove("hidden");
 
@@ -470,6 +471,58 @@ function renderMetricsChart(statistics) {
             responsive: true,
             scales: {
                 y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+
+function renderCategoryChart(categories) {
+    const canvas = document.getElementById("categoryChart");
+    const status = document.getElementById("categoryChartStatus");
+
+    if (!canvas || !status) return;
+
+    if (typeof Chart === "undefined") {
+        status.textContent =
+            "Não foi possível carregar a biblioteca de gráficos.";
+        return;
+    }
+
+    const previousChart = Chart.getChart(canvas);
+
+    if (previousChart) {
+        previousChart.destroy();
+    }
+
+    if (!Array.isArray(categories) || categories.length === 0) {
+        status.textContent =
+            "Nenhum dado de receita por categoria foi identificado.";
+        return;
+    }
+
+    const labels = categories.map(item => item.category);
+    const values = categories.map(item => item.revenue);
+
+    status.textContent = "Comparativo de receita por categoria";
+
+    new Chart(canvas, {
+        type: "bar",
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "Receita (R$)",
+                data: values,
+                backgroundColor: "rgba(45, 185, 225, 0.7)"
+            }]
+        },
+        options: {
+            indexAxis: "y",
+            responsive: true,
+            scales: {
+                x: {
                     beginAtZero: true
                 }
             }

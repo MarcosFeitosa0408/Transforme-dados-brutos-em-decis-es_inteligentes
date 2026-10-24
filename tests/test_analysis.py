@@ -280,3 +280,57 @@ def test_receita_has_priority_over_faturamento():
         "Receita total identificada: R$ 3,000.00." in insight
         for insight in result["insights"]
     )
+
+
+def test_revenue_by_category():
+    df = pd.DataFrame(
+        {
+            "Categoria": [
+                "Eletrônicos",
+                "Móveis",
+                "Eletrônicos",
+                "Móveis",
+            ],
+            "Receita": [100.0, 200.0, 300.0, 50.0],
+        }
+    )
+
+    result = analyze_dataframe(df)
+
+    assert result["revenue_by_category"] == [
+        {
+            "category": "Eletrônicos",
+            "revenue": 400.0,
+        },
+        {
+            "category": "Móveis",
+            "revenue": 250.0,
+        },
+    ]
+
+
+    def test_revenue_by_category():
+     df = pd.DataFrame(
+        {
+            "Categoria": [
+                "Eletrônicos",
+                "Móveis",
+                "Eletrônicos",
+                "Móveis",
+            ],
+            "Receita": [100.0, 200.0, 300.0, 50.0],
+        }
+    )
+
+    result = analyze_dataframe(df)
+
+    assert result["revenue_by_category"] == [
+        {
+            "category": "Eletrônicos",
+            "revenue": 400.0,
+        },
+        {
+            "category": "Móveis",
+            "revenue": 250.0,
+        },
+    ]

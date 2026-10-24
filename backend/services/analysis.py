@@ -178,7 +178,7 @@ def analyze_dataframe(df: pd.DataFrame) -> dict:
     }
 
     detected_business_columns = {}
-
+    
     for business_name, aliases in BUSINESS_COLUMN_ALIASES.items():
         for alias in aliases:
             if alias in normalized_columns:
@@ -186,6 +186,32 @@ def analyze_dataframe(df: pd.DataFrame) -> dict:
                     normalized_columns[alias]
             )
                 break
+
+
+                # Agrupamento da receita por categoria
+    revenue_by_category = []
+
+    if (
+        "receita" in detected_business_columns
+        and "categoria" in normalized_columns
+    ):
+        revenue_column = detected_business_columns["receita"]
+        category_column = normalized_columns["categoria"]
+
+        if pd.api.types.is_numeric_dtype(df[revenue_column]):
+            grouped = (
+                df.groupby(category_column)[revenue_column]
+                .sum()
+                .sort_values(ascending=False)
+            )
+
+            revenue_by_category = [
+                {
+                    "category": str(category),
+                    "revenue": round(float(total), 2),
+                }
+                for category, total in grouped.items()
+            ]
 
     if "receita" in detected_business_columns:
         column = detected_business_columns["receita"]
@@ -260,5 +286,6 @@ def analyze_dataframe(df: pd.DataFrame) -> dict:
         "calendar_columns": calendar_columns,
         "calendar_summary": calendar_summary,
         "numeric_statistics": numeric_statistics,
+        "revenue_by_category": revenue_by_category,
         "insights": insights,
     }
