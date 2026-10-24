@@ -167,6 +167,18 @@
                     ></div>
                 </article>
 
+                <article class="panel">
+    <h3>Gráfico automático de indicadores</h3>
+
+                <p id="chartStatus">
+        Envie uma planilha CSV ou Excel para gerar o gráfico.
+                </p>
+
+            <div class="chart-container">
+            <canvas id="metricsChart"></canvas>
+                      </div>
+                 </article>
+
             <article class="panel statistics-panel">
 
                 <h3>Estatísticas numéricas</h3>
@@ -204,6 +216,7 @@
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
     <script src="script.js"></script>
 
 </body>

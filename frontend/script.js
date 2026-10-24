@@ -165,12 +165,14 @@ function renderResults(data) {
     analysis.calendar_columns,
     analysis.calendar_summary);
     renderStatistics(analysis.numeric_statistics);
+    renderMetricsChart(analysis.numeric_statistics);
 
     results.classList.remove("hidden");
 
     results.scrollIntoView({
         behavior: "smooth",
         block: "start",
+
     });
 }
 
@@ -400,4 +402,77 @@ function showError(message) {
 function clearError() {
     errorMessage.textContent = "";
     errorMessage.classList.add("hidden");
+}
+
+function renderMetricsChart(statistics) {
+    const canvas = document.getElementById("metricsChart");
+    const status = document.getElementById("chartStatus");
+
+    if (!canvas || !status) return;
+
+    if (typeof Chart === "undefined") {
+        status.textContent = "Não foi possível carregar a biblioteca de gráficos.";
+        return;
+    }
+
+    const indicators = {
+        Receita: ["receita", "faturamento", "valor_venda", "valor_vendas", "total_vendas", "vendas", "revenue", "sales"],
+        Custo: ["custo", "custos", "custo_total", "valor_custo", "cost", "costs"],
+        Lucro: ["lucro", "lucro_total", "resultado", "profit"]
+    };
+
+    const normalized = Object.entries(statistics || {}).map(([name, data]) => ({
+        name: name.normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9]+/g, "_"),
+        data
+    }));
+
+    const labels = [];
+    const values = [];
+
+    for (const [label, aliases] of Object.entries(indicators)) {
+        const match = aliases
+            .map(alias => normalized.find(item => item.name === alias))
+            .find(item => item && Number.isFinite(item.data.sum));
+
+        if (match) {
+            labels.push(label);
+            values.push(match.data.sum);
+        }
+    }
+
+    const previousChart = Chart.getChart(canvas);
+
+    if (previousChart) {
+        previousChart.destroy();
+    }
+
+    if (labels.length === 0) {
+        status.textContent = "Nenhum indicador financeiro identificado para o gráfico.";
+        return;
+    }
+
+    status.textContent = "Comparativo de indicadores financeiros";
+
+    new Chart(canvas, {
+        type: "bar",
+        data: {
+            labels,
+            datasets: [{
+                label: "Total (R$)",
+                data: values
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
 }
