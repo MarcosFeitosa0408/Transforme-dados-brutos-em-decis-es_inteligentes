@@ -10,6 +10,7 @@ const errorMessage = document.getElementById("errorMessage");
 const results = document.getElementById("results");
 
 const resultFilename = document.getElementById("resultFilename");
+const exportAnalysisBtn = document.getElementById("exportAnalysisBtn");
 const rowsValue = document.getElementById("rowsValue");
 const columnsValue = document.getElementById("columnsValue");
 const missingValue = document.getElementById("missingValue");
@@ -21,6 +22,7 @@ const metricsList = document.getElementById("metricsList");
 const statisticsTable = document.getElementById("statisticsTable");
 
 let currentFile = null;
+let currentAnalysisData = null;
 
 
 /*
@@ -88,7 +90,10 @@ analyzeButton.addEventListener("click", async () => {
         return;
     }
 
-    clearError();
+        clearError();
+
+    currentAnalysisData = null;
+    exportAnalysisBtn.disabled = true;
 
     loading.classList.remove("hidden");
     results.classList.add("hidden");
@@ -168,6 +173,9 @@ function renderResults(data) {
     renderMetricsChart(analysis.numeric_statistics);
     renderCategoryChart(analysis.revenue_by_category);
     renderMonthlyChart(analysis.revenue_by_month);
+    
+    currentAnalysisData = data;
+    exportAnalysisBtn.disabled = false;
 
     results.classList.remove("hidden");
 
@@ -611,3 +619,72 @@ function renderMonthlyChart(monthlyData) {
         }
     });
 }
+
+
+exportAnalysisBtn.addEventListener("click", () => {
+    if (!currentAnalysisData) {
+        return;
+    }
+
+    const { filename, analysis } = currentAnalysisData;
+
+    const lines = [
+        "DATAPILOT - RELATORIO DE ANALISE",
+        "================================",
+        "",
+        `Arquivo analisado: ${filename}`,
+        `Linhas: ${formatInteger(analysis.rows)}`,
+        `Colunas: ${formatInteger(analysis.columns)}`,
+        `Valores ausentes: ${formatInteger(analysis.missing_values.total)}`,
+        `Linhas duplicadas: ${formatInteger(analysis.duplicate_rows)}`,
+        `Qualidade dos dados: ${formatNumber(analysis.quality_score)}%`,
+        "",
+        "INSIGHTS AUTOMATICOS",
+        "--------------------",
+        ...(analysis.insights || []).map(
+            insight => `- ${formatBrazilianInsight(insight)}`
+        ),
+        "",
+        "ESTATISTICAS NUMERICAS",
+        "----------------------",
+        ...Object.entries(analysis.numeric_statistics || {}).map(
+            ([name, values]) =>
+                `${name}: minimo ${formatNumber(values.minimum)}, ` +
+                `maximo ${formatNumber(values.maximum)}, ` +
+                `media ${formatNumber(values.mean)}, ` +
+                `mediana ${formatNumber(values.median)}, ` +
+                `total ${"sum" in values ? formatNumber(values.sum) : "N/A"}`
+        ),
+        "",
+        "RECEITA POR CATEGORIA",
+        "---------------------",
+        ...(analysis.revenue_by_category || []).map(
+            item => `${item.category}: R$ ${formatNumber(item.revenue)}`
+        ),
+        "",
+        "EVOLUCAO MENSAL DA RECEITA",
+        "-------------------------",
+        ...(analysis.revenue_by_month || []).map(
+            item =>
+                `${String(item.month).padStart(2, "0")}/${item.year}: ` +
+                `R$ ${formatNumber(item.revenue)}`
+        )
+    ];
+
+    const blob = new Blob(
+        ["\uFEFF", lines.join("\r\n")],
+        { type: "text/plain;charset=utf-8" }
+    );
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "DataPilot_Relatorio_Analise.txt";
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
