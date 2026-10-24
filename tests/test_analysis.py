@@ -334,3 +334,33 @@ def test_revenue_by_category():
             "revenue": 250.0,
         },
     ]
+
+
+def test_revenue_by_month():
+    df = pd.DataFrame(
+        {
+            "Ano": [2025, 2024, 2025, 2024, 2025],
+            "Mês": [2, 12, 1, 12, 1],
+            "Receita": [250.0, 100.0, 90.0, 50.0, 10.0],
+        }
+    )
+
+    result = analyze_dataframe(df)
+
+    assert result["revenue_by_month"] == [
+        {
+            "year": 2024,
+            "month": 12,
+            "revenue": 150.0,
+        },
+        {
+            "year": 2025,
+            "month": 1,
+            "revenue": 100.0,
+        },
+        {
+            "year": 2025,
+            "month": 2,
+            "revenue": 250.0,
+        },
+]

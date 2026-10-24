@@ -213,6 +213,38 @@ def analyze_dataframe(df: pd.DataFrame) -> dict:
                 for category, total in grouped.items()
             ]
 
+                # Agrupamento da receita por ano e mês
+    revenue_by_month = []
+
+    if (
+        "receita" in detected_business_columns
+        and "ano" in normalized_columns
+        and "mes" in normalized_columns
+    ):
+        revenue_column = detected_business_columns["receita"]
+        year_column = normalized_columns["ano"]
+        month_column = normalized_columns["mes"]
+
+        if (
+            pd.api.types.is_numeric_dtype(df[revenue_column])
+            and pd.api.types.is_numeric_dtype(df[year_column])
+            and pd.api.types.is_numeric_dtype(df[month_column])
+        ):
+            grouped_monthly = (
+                df.groupby([year_column, month_column])[revenue_column]
+                .sum()
+                .sort_index()
+            )
+
+            revenue_by_month = [
+                {
+                    "year": int(year),
+                    "month": int(month),
+                    "revenue": round(float(total), 2),
+                }
+                for (year, month), total in grouped_monthly.items()
+            ]
+
     if "receita" in detected_business_columns:
         column = detected_business_columns["receita"]
         total_revenue = float(df[column].sum())
@@ -287,5 +319,6 @@ def analyze_dataframe(df: pd.DataFrame) -> dict:
         "calendar_summary": calendar_summary,
         "numeric_statistics": numeric_statistics,
         "revenue_by_category": revenue_by_category,
+        "revenue_by_month": revenue_by_month,
         "insights": insights,
     }

@@ -167,6 +167,7 @@ function renderResults(data) {
     renderStatistics(analysis.numeric_statistics);
     renderMetricsChart(analysis.numeric_statistics);
     renderCategoryChart(analysis.revenue_by_category);
+    renderMonthlyChart(analysis.revenue_by_month);
 
     results.classList.remove("hidden");
 
@@ -523,6 +524,87 @@ function renderCategoryChart(categories) {
             responsive: true,
             scales: {
                 x: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+
+function renderMonthlyChart(monthlyData) {
+    const canvas = document.getElementById("monthlyChart");
+    const status = document.getElementById("monthlyChartStatus");
+
+    if (!canvas || !status) return;
+
+    if (typeof Chart === "undefined") {
+        status.textContent =
+            "Não foi possível carregar a biblioteca de gráficos.";
+        return;
+    }
+
+    const previousChart = Chart.getChart(canvas);
+
+    if (previousChart) {
+        previousChart.destroy();
+    }
+
+    if (!Array.isArray(monthlyData) || monthlyData.length === 0) {
+        status.textContent =
+            "Nenhum dado de receita mensal foi identificado.";
+        return;
+    }
+
+    const monthNames = [
+        "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
+        "Jul", "Ago", "Set", "Out", "Nov", "Dez"
+    ];
+
+    const validData = monthlyData.filter(item =>
+        Number.isInteger(item.year) &&
+        Number.isInteger(item.month) &&
+        item.month >= 1 &&
+        item.month <= 12 &&
+        Number.isFinite(item.revenue)
+    );
+
+    if (validData.length === 0) {
+        status.textContent =
+            "Nenhum período mensal válido foi identificado.";
+        return;
+    }
+
+    validData.sort((a, b) =>
+        a.year - b.year || a.month - b.month
+    );
+
+    const labels = validData.map(item =>
+        `${monthNames[item.month - 1]}/${item.year}`
+    );
+
+    const values = validData.map(item => item.revenue);
+
+    status.textContent = "Comparativo da receita ao longo dos meses";
+
+    new Chart(canvas, {
+        type: "line",
+        data: {
+            labels,
+            datasets: [{
+                label: "Receita (R$)",
+                data: values,
+                borderColor: "rgb(45, 185, 225)",
+                backgroundColor: "rgba(45, 185, 225, 0.15)",
+                borderWidth: 3,
+                tension: 0.2,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
                     beginAtZero: true
                 }
             }
