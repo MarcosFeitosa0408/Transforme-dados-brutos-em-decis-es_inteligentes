@@ -179,7 +179,9 @@ function renderResults(data) {
     renderFinancialConsistency(
     analysis.financial_consistency,
     analysis.rows
-);
+ );
+
+    renderFinancialAlerts(analysis.financial_value_alerts);
 
     currentAnalysisData = data;
     exportAnalysisBtn.disabled = false;
@@ -808,4 +810,61 @@ function renderFinancialConsistency(consistency, totalRows) {
         tag.textContent = indicator;
         details.appendChild(tag);
     });
+}
+
+
+function renderFinancialAlerts(alerts) {
+    const status = document.getElementById(
+        "financialAlertsStatus"
+    );
+
+    const details = document.getElementById(
+        "financialAlertsDetails"
+    );
+
+    if (!status || !details) return;
+
+    details.replaceChildren();
+
+    if (!alerts || Object.keys(alerts).length === 0) {
+        status.textContent =
+            "Não avaliado: nenhuma coluna financeira numérica identificada.";
+        return;
+    }
+
+    const labels = {
+        receita: "Receita",
+        custo: "Custo",
+        lucro: "Lucro"
+    };
+
+    let hasAlerts = false;
+
+    Object.entries(labels).forEach(([name, label]) => {
+        const info = alerts[name];
+
+        if (!info) return;
+
+        const negative = info.negative_rows;
+        const zero = info.zero_rows;
+        const missing = info.missing_rows;
+
+        if (negative > 0 || zero > 0 || missing > 0) {
+            hasAlerts = true;
+        }
+
+        const tag = document.createElement("span");
+        tag.className = "metric-tag";
+
+        tag.textContent =
+            `${label}: Negativos ${formatInteger(negative)} | ` +
+            `Zeros ${formatInteger(zero)} | ` +
+            `Ausentes ${formatInteger(missing)}`;
+
+        details.appendChild(tag);
+    });
+
+    status.textContent = hasAlerts
+        ? "Atenção: foram identificados valores que merecem revisão."
+        : "Nenhum valor negativo, zero ou ausente nas colunas avaliadas.";
 }
