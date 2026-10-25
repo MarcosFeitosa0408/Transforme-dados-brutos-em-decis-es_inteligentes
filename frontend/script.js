@@ -176,6 +176,11 @@ function renderResults(data) {
     renderCategoryChart(analysis.revenue_by_category);
     renderMonthlyChart(analysis.revenue_by_month);
     
+    renderFinancialConsistency(
+    analysis.financial_consistency,
+    analysis.rows
+);
+
     currentAnalysisData = data;
     exportAnalysisBtn.disabled = false;
     exportPdfBtn.disabled = false;
@@ -755,3 +760,52 @@ window.addEventListener("afterprint", () => {
         }
     });
 });
+
+
+function renderFinancialConsistency(consistency, totalRows) {
+    const status = document.getElementById(
+        "financialConsistencyStatus"
+    );
+
+    const details = document.getElementById(
+        "financialConsistencyDetails"
+    );
+
+    if (!status || !details) return;
+
+    details.replaceChildren();
+
+    if (!consistency) {
+        status.textContent =
+            "Não avaliada: são necessárias as colunas numéricas Receita, Custo e Lucro.";
+        return;
+    }
+
+    const checked = consistency.checked_rows;
+    const inconsistent = consistency.inconsistent_rows;
+    const notChecked = Math.max(0, totalRows - checked);
+
+    if (checked === 0) {
+        status.textContent =
+            "Não avaliada: nenhuma linha possui todos os valores necessários.";
+    } else if (inconsistent > 0) {
+        status.textContent =
+            `Atenção: ${formatInteger(inconsistent)} divergência(s) identificada(s).`;
+    } else {
+        status.textContent =
+            "Nenhuma divergência nas linhas verificadas.";
+    }
+
+    const indicators = [
+        `Linhas verificadas: ${formatInteger(checked)}`,
+        `Com divergências: ${formatInteger(inconsistent)}`,
+        `Não verificadas: ${formatInteger(notChecked)}`
+    ];
+
+    indicators.forEach((indicator) => {
+        const tag = document.createElement("span");
+        tag.className = "metric-tag";
+        tag.textContent = indicator;
+        details.appendChild(tag);
+    });
+}
