@@ -431,3 +431,70 @@ tbody tr:last-child td {
         flex-direction: column;
     }
 }
+
+
+/* --------------------------------------------------
+   Relatório PDF - DataPilot
+-------------------------------------------------- */
+
+@media print {
+    @page {
+        size: A4;
+        margin: 12mm;
+    }
+
+    body {
+        background: #ffffff !important;
+        color: #111111 !important;
+    }
+
+    header,
+    .hero,
+    .upload-card,
+    footer,
+    #exportAnalysisBtn,
+    #exportPdfBtn {
+        display: none !important;
+    }
+
+    .container {
+        width: 100% !important;
+        max-width: none !important;
+    }
+
+    .results,
+    .results * {
+        color: #111111 !important;
+    }
+
+    .kpi-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    .content-grid {
+        display: block !important;
+    }
+
+    .panel,
+    .kpi-card {
+        background: #ffffff !important;
+        border: 1px solid #dddddd !important;
+        box-shadow: none !important;
+        break-inside: avoid;
+        margin-bottom: 16px;
+    }
+
+    .chart-container {
+        width: 100% !important;
+        height: 260px !important;
+    }
+
+    .table-wrapper {
+        overflow: visible !important;
+    }
+
+    table {
+        width: 100%;
+        font-size: 10px;
+    }
+}

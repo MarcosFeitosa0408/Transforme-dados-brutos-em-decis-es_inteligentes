@@ -11,6 +11,7 @@ const results = document.getElementById("results");
 
 const resultFilename = document.getElementById("resultFilename");
 const exportAnalysisBtn = document.getElementById("exportAnalysisBtn");
+const exportPdfBtn = document.getElementById("exportPdfBtn");
 const rowsValue = document.getElementById("rowsValue");
 const columnsValue = document.getElementById("columnsValue");
 const missingValue = document.getElementById("missingValue");
@@ -94,6 +95,7 @@ analyzeButton.addEventListener("click", async () => {
 
     currentAnalysisData = null;
     exportAnalysisBtn.disabled = true;
+    exportPdfBtn.disabled = true;
 
     loading.classList.remove("hidden");
     results.classList.add("hidden");
@@ -176,6 +178,7 @@ function renderResults(data) {
     
     currentAnalysisData = data;
     exportAnalysisBtn.disabled = false;
+    exportPdfBtn.disabled = false;
 
     results.classList.remove("hidden");
 
@@ -710,4 +713,45 @@ exportAnalysisBtn.addEventListener("click", () => {
     link.remove();
 
     setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
+
+
+exportPdfBtn.addEventListener("click", () => {
+    if (!currentAnalysisData) {
+        return;
+    }
+
+    window.print();
+});
+
+
+// Ajusta os três gráficos para impressão em PDF
+const printChartIds = [
+    "metricsChart",
+    "categoryChart",
+    "monthlyChart"
+];
+
+window.addEventListener("beforeprint", () => {
+    if (typeof Chart === "undefined") return;
+
+    printChartIds.forEach((id) => {
+        const chart = Chart.getChart(id);
+
+        if (chart) {
+            chart.resize(600, 240);
+        }
+    });
+});
+
+window.addEventListener("afterprint", () => {
+    if (typeof Chart === "undefined") return;
+
+    printChartIds.forEach((id) => {
+        const chart = Chart.getChart(id);
+
+        if (chart) {
+            chart.resize();
+        }
+    });
 });
