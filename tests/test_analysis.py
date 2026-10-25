@@ -385,3 +385,40 @@ def test_financial_consistency():
     }
 
     pd.testing.assert_frame_equal(df, original_df)
+
+
+def test_financial_value_alerts():
+    df = pd.DataFrame(
+        {
+            "Receita": [100.0, -20.0, 0.0, None],
+            "Custo": [20.0, 0.0, -5.0, None],
+            "Lucro": [80.0, -20.0, 5.0, 0.0],
+        }
+    )
+
+    original_df = df.copy(deep=True)
+
+    result = analyze_dataframe(df)
+
+    assert result["financial_value_alerts"] == {
+        "receita": {
+            "column": "Receita",
+            "negative_rows": 1,
+            "zero_rows": 1,
+            "missing_rows": 1,
+        },
+        "custo": {
+            "column": "Custo",
+            "negative_rows": 1,
+            "zero_rows": 1,
+            "missing_rows": 1,
+        },
+        "lucro": {
+            "column": "Lucro",
+            "negative_rows": 1,
+            "zero_rows": 1,
+            "missing_rows": 0,
+        },
+    }
+
+    pd.testing.assert_frame_equal(df, original_df)

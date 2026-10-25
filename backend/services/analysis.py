@@ -223,6 +223,26 @@ def analyze_dataframe(df: pd.DataFrame) -> dict:
                 "inconsistent_rows": inconsistent_rows,
             }
                 # Agrupamento da receita por categoria
+                    # Identificação de valores financeiros que merecem revisão
+    financial_value_alerts = {}
+
+    for business_name in ("receita", "custo", "lucro"):
+        column = detected_business_columns.get(business_name)
+
+        if column is None:
+            continue
+
+        series = df[column]
+
+        if not pd.api.types.is_numeric_dtype(series):
+            continue
+
+        financial_value_alerts[business_name] = {
+            "column": column,
+            "negative_rows": int((series < 0).sum()),
+            "zero_rows": int((series == 0).sum()),
+            "missing_rows": int(series.isna().sum()),
+        }
     revenue_by_category = []
 
     if (
@@ -355,5 +375,6 @@ def analyze_dataframe(df: pd.DataFrame) -> dict:
         "revenue_by_category": revenue_by_category,
         "revenue_by_month": revenue_by_month,
         "financial_consistency": financial_consistency,
+        "financial_value_alerts": financial_value_alerts,
         "insights": insights,
     }
