@@ -364,3 +364,24 @@ def test_revenue_by_month():
             "revenue": 250.0,
         },
 ]
+
+
+def test_financial_consistency():
+    df = pd.DataFrame(
+        {
+            "Receita": [100.0, 200.0, 300.0, 400.0],
+            "Custo": [40.0, 80.0, 120.0, None],
+            "Lucro": [60.0, 119.99, 180.0, 200.0],
+        }
+    )
+
+    original_df = df.copy(deep=True)
+
+    result = analyze_dataframe(df)
+
+    assert result["financial_consistency"] == {
+        "checked_rows": 3,
+        "inconsistent_rows": 1,
+    }
+
+    pd.testing.assert_frame_equal(df, original_df)

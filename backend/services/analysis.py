@@ -187,7 +187,41 @@ def analyze_dataframe(df: pd.DataFrame) -> dict:
             )
                 break
 
+    # Validação da consistência financeira
+    financial_consistency = None
 
+    required_columns = ("receita", "custo", "lucro")
+
+    if all(
+        name in detected_business_columns
+        for name in required_columns
+    ):
+        revenue_col = detected_business_columns["receita"]
+        cost_col = detected_business_columns["custo"]
+        profit_col = detected_business_columns["lucro"]
+
+        columns = [revenue_col, cost_col, profit_col]
+
+        if all(
+            pd.api.types.is_numeric_dtype(df[col])
+            for col in columns
+        ):
+            valid_rows = df[columns].dropna()
+
+            differences = (
+                valid_rows[revenue_col]
+                - valid_rows[cost_col]
+                - valid_rows[profit_col]
+            )
+
+            inconsistent_rows = int(
+                (differences.abs().round(2) > 0).sum()
+            )
+
+            financial_consistency = {
+                "checked_rows": int(len(valid_rows)),
+                "inconsistent_rows": inconsistent_rows,
+            }
                 # Agrupamento da receita por categoria
     revenue_by_category = []
 
@@ -320,5 +354,6 @@ def analyze_dataframe(df: pd.DataFrame) -> dict:
         "numeric_statistics": numeric_statistics,
         "revenue_by_category": revenue_by_category,
         "revenue_by_month": revenue_by_month,
+        "financial_consistency": financial_consistency,
         "insights": insights,
     }
