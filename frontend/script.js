@@ -328,6 +328,19 @@ function formatInteger(value) {
     ).format(value);
 }
 
+function formatCurrency(value) {
+    if (value === null || value === undefined) {
+        return "-";
+    }
+
+    return new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(value);
+}
+
 
 function formatNumber(value) {
     if (value === null || value === undefined) {
@@ -363,23 +376,33 @@ function formatFileSize(bytes) {
 */
 
 function formatBrazilianInsight(text) {
-    return text.replace(
+    const formattedCurrency = text.replace(
         /R\$\s([\d,]+\.\d{2})/g,
         (_, value) => {
-            const numericValue =
-                Number(value.replace(/,/g, ""));
+            const numericValue = Number(
+                value.replace(/,/g, "")
+            );
 
-            return new Intl.NumberFormat(
+            return formatCurrency(numericValue);
+        }
+    );
+
+    return formattedCurrency.replace(
+        /(-?\d+(?:\.\d+)?)%/g,
+        (_, value) => {
+            const formattedValue = new Intl.NumberFormat(
                 "pt-BR",
                 {
-                    style: "currency",
-                    currency: "BRL",
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
                 }
-            ).format(numericValue);
+            ).format(Number(value));
+
+            return `${formattedValue}%`;
         }
     );
 }
-
+    
 
 /*
 |--------------------------------------------------------------------------
@@ -659,7 +682,7 @@ exportAnalysisBtn.addEventListener("click", () => {
         "RECEITA POR CATEGORIA",
         "---------------------",
         ...(analysis.revenue_by_category || []).map(
-            item => `${item.category}: R$ ${formatNumber(item.revenue)}`
+            item => `${item.category}: ${formatCurrency(item.revenue)}`
         ),
         "",
         "EVOLUCAO MENSAL DA RECEITA",
@@ -667,7 +690,7 @@ exportAnalysisBtn.addEventListener("click", () => {
         ...(analysis.revenue_by_month || []).map(
             item =>
                 `${String(item.month).padStart(2, "0")}/${item.year}: ` +
-                `R$ ${formatNumber(item.revenue)}`
+                `${formatCurrency(item.revenue)}`
         )
     ];
 
