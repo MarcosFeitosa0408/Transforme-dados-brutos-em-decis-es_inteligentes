@@ -379,10 +379,8 @@ def test_financial_consistency():
 
     result = analyze_dataframe(df)
 
-    assert result["financial_consistency"] == {
-        "checked_rows": 3,
-        "inconsistent_rows": 1,
-    }
+    assert result["financial_consistency"]["checked_rows"] == 3
+    assert result["financial_consistency"]["inconsistent_rows"] == 1
 
     pd.testing.assert_frame_equal(df, original_df)
 
@@ -420,5 +418,43 @@ def test_financial_value_alerts():
             "missing_rows": 0,
         },
     }
+
+    pd.testing.assert_frame_equal(df, original_df)
+
+
+def test_financial_inconsistent_details():
+    df = pd.DataFrame(
+        {
+            "produto": [
+                "Produto A",
+                "Produto B",
+                "Produto C",
+                "Produto D",
+            ],
+            "receita": [100.0, -20.0, 0.0, None],
+            "custo": [20.0, 0.0, -5.0, None],
+            "lucro": [80.0, -20.0, 4.0, 0.0],
+        }
+    )
+
+    original_df = df.copy(deep=True)
+
+    result = analyze_dataframe(df)
+
+    consistency = result["financial_consistency"]
+
+    assert consistency["checked_rows"] == 3
+    assert consistency["inconsistent_rows"] == 1
+
+    assert consistency["inconsistent_details"] == [
+        {
+            "row_number": 3,
+            "revenue": 0.0,
+            "cost": -5.0,
+            "reported_profit": 4.0,
+            "calculated_profit": 5.0,
+            "difference": 1.0,
+        }
+    ]
 
     pd.testing.assert_frame_equal(df, original_df)

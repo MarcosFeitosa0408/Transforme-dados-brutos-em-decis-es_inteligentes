@@ -214,16 +214,40 @@ def analyze_dataframe(df: pd.DataFrame) -> dict:
                 - valid_rows[profit_col]
             )
 
+            inconsistent_mask = differences.abs().round(2) > 0
+
+            inconsistent_records = valid_rows.loc[inconsistent_mask]
+
+            inconsistent_details = []
+
+            for row_index, row in inconsistent_records.iterrows():
+                revenue = float(row[revenue_col])
+                cost = float(row[cost_col])
+                reported_profit = float(row[profit_col])
+                calculated_profit = revenue - cost
+
+                inconsistent_details.append({
+                    "row_number": int(row_index) + 1,
+                    "revenue": round(revenue, 2),
+                    "cost": round(cost, 2),
+                    "reported_profit": round(reported_profit, 2),
+                    "calculated_profit": round(calculated_profit, 2),
+                    "difference": round(
+                        calculated_profit - reported_profit, 2
+                    ),
+                })
+
             inconsistent_rows = int(
-                (differences.abs().round(2) > 0).sum()
+                inconsistent_mask.sum()
             )
 
             financial_consistency = {
                 "checked_rows": int(len(valid_rows)),
                 "inconsistent_rows": inconsistent_rows,
+                "inconsistent_details": inconsistent_details,
             }
-                # Agrupamento da receita por categoria
-                    # Identificação de valores financeiros que merecem revisão
+    
+    # Identificação de valores financeiros que merecem revisão
     financial_value_alerts = {}
 
     for business_name in ("receita", "custo", "lucro"):
