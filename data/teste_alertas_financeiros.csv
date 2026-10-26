@@ -1,0 +1,5 @@
+produto,receita,custo,lucro
+Produto A,100,20,80
+Produto B,-20,0,-20
+Produto C,0,-5,4
+Produto D,,,0
